@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Question</title>
+    <style>
+        body {
+            font-family: Calibri, sans-serif;
+            background-color: #f8f9fa;
+            margin: 20px;
+            color: #333;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #4A90E2;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .checkbox-container {
+        display: block;
+        margin-top: 10px;
+    }
+    .checkbox-container input[type="checkbox"] {
+        margin-right: 0px; /* Adjust spacing between checkbox and label */
+        /*vertical-align: left; /* Align checkbox with label text */
+    }
+    .checkbox-container label {
+        display: inline; /* Ensure label is inline with the checkbox */
+        /*font-weight: normal; /* Optional: Adjust font weight for consistency */
+    }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .link {
+            text-align: center;
+            display: block;
+            margin-top: 15px;
+            color: #4A90E2;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Add New Question</h2>
+        <form method="POST">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+
+
+
+
+
+
+
+
+
+
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="15" required></textarea>
+
+            <div class="form-group" style="margin: 10px 0;">
+            <div style="display: inline-flex; align-items: center; white-space: nowrap;">
+                <label for="mngr_approval_required" style="font-weight: bold; margin: 0 8px 0 0;">Manager Approval Required:</label>
+                <input type="checkbox" id="mngr_approval_required" name="mngr_approval_required">
+            </div>
+            </div>
+            <br>
+            
+<div id="credits-section" style="display:none;">
+    <label for="assignCredits">Assign Credits:</label>
+    <input type="number" id="assignCredits" name="credits" min="0" style="width: 50%;">
+    <div style="color: goldenrod; font-size: small;">Available credits: {{ earned_credits }}</div>
+    <div id="credit-error" style="color: red; font-size: small; display: none;">Invalid credit value</div>
+</div>
+
+        
+
+            <label for="date">Due Date:</label>
+            <input type="date" id="duedate" name="duedate" required>
+
+            <label for="team">Team:</label>
+            <input type="text" id="team" name="team" required>
+
+            <label for="tags">Add tags</label>
+            <input type="text" id="tags" name="tags" placeholder="e.g. sql dotnet">
+
+     
+            
+
+            <button type="submit">Submit Question</button>
+        </form>
+
+        <a class="link" href="{{ url_for('task_details') }}">View All Questions</a>
+    </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const checkbox = document.getElementById('mngr_approval_required');
+    const creditSection = document.getElementById('credits-section');
+    const creditInput = document.getElementById('assignCredits');
+    const creditError = document.getElementById('credit-error');
+    const availableCredits = {{ earned_credits }};
+
+    creditSection.style.display = checkbox.checked ? 'none' : 'block';
+
+    checkbox.addEventListener('change', () => {
+        creditSection.style.display = checkbox.checked ? 'none' : 'block';
+    });
+
+    creditInput.addEventListener('blur', () => {
+        const val = parseInt(creditInput.value, 10);
+        if (isNaN(val) || val < 0 || val > availableCredits) {
+            creditError.style.display = 'block';
+        } else {
+            creditError.style.display = 'none';
+        }
+    });
+});
+</script>
+
+</body>
+</html>

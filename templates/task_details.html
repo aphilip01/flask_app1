@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Details</title>
+    <style>
+        body { font-family: 'Calibri', Times, serif, sans-serif; margin: 20px; background-color: #f0f2f5; }
+        h2 { margin-bottom: 20px; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .tab-buttons { display: flex; gap: 10px; }
+        .tab-buttons button, .logout-btn {
+            padding: 10px 20px; border: none; background-color: #007bff; color: white;
+            cursor: pointer; border-radius: 5px; font-size: 16px;
+        }
+        .tab-buttons button:hover, .logout-btn:hover { background-color: #0056b3; }
+        .logout-btn { background-color: #dc3545; }
+        .logout-btn:hover { background-color: #c82333; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        table {
+            width: 100%; border-collapse: collapse; background-color: #fff;
+            table-layout: fixed; word-wrap: break-word;
+        }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; overflow: hidden; }
+        
+th:nth-child(1), td:nth-child(1) { width: 30px; }     /* Id */
+th:nth-child(2), td:nth-child(2) { width: 100px; }    /* Title */
+th:nth-child(3), td:nth-child(3) { width: 100px; }    /* Description */
+th:nth-child(4), td:nth-child(4) { width: 80px; }     /* Asked By */
+th:nth-child(5), td:nth-child(5) { width: 80px; }     /* Accepted By */
+th:nth-child(6), td:nth-child(6) { width: 80px; }     /* Due Date */
+th:nth-child(7), td:nth-child(7) { width: 80px; }     /* Team */
+th:nth-child(8), td:nth-child(8) { width: 120px; }    /* Actions / Comments */
+th:nth-child(9), td:nth-child(9) { width: 120px; }    /* Date Posted */
+th:nth-child(10), td:nth-child(10) { width: 60px; }   /* Expired */
+th:nth-child(11), td:nth-child(11) { width: 100px; }  /* Status */
+th:nth-child(12), td:nth-child(12) { width: 80px; }   /* Credits */
+th:nth-child(13), td:nth-child(13) { width: 80px; }   /* Next Step */
+
+
+            
+        .description-cell { max-width: 150px; word-wrap: break-word; white-space: normal; }
+        .status-cell { max-width: 150px; word-wrap: break-word; white-space: normal; }
+        .credits-cell { max-width: 100px; word-wrap: break-word; white-space: normal; text-align: center; }
+        .toggle-btn { cursor: pointer; color: #007bff; text-decoration: underline; }
+        .comment-section { display: none; background-color: #f9f9f9; }
+        .comment-section td { overflow-wrap: break-word; word-wrap: break-word; white-space: normal; max-width: 100%; }
+        .full-description { margin-bottom: 15px; padding: 10px; background-color: #e9ecef; border-radius: 5px; font-size: 16px; }
+        .comment-form, .comments-list { width: 100%; max-width: 600px; }
+        .comment-form { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; margin-bottom: 20px; }
+        .comment-form input, .comment-form button { padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
+        .comment-item { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ddd; padding: 5px 0; }
+        .accept-btn { margin-left: 10px; padding: 5px 10px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .accept-btn:disabled { background-color: #28a745; cursor: not-allowed; }
+        .accept-btn.unaccepted:disabled { background-color: #ccc; } /* Added for unaccepted buttons */
+        .raise-query-button { padding: 10px 20px; border: none; background-color: #007bff; color: white; cursor: pointer; border-radius: 5px; font-size: 16px; }
+        .raise-query-button:hover { background-color: #0056b3; }
+        .action-buttons { display: flex; gap: 5px; white-space: nowrap; flex-wrap: nowrap; }
+        .approve-btn, .reject-btn, .status-btn {
+            padding: 6px 10px; font-size: 13px; border: none; border-radius: 5px; cursor: pointer; color: white; display: inline-block;
+            width: 80px; text-align: center; /* Equal width for buttons */
+        }
+        .approve-btn { background-color: #28a745; }
+        .approve-btn:hover:not(:disabled) { background-color: #218838; }
+    
+
+        .reject-btn { background-color: #dc3545; }
+        .reject-btn:hover:not(:disabled) { background-color: #c82333; }
+        .status-btn { background-color: #6c757d; cursor: default; }
+        .status-btn.approved { background-color: #28a745; }
+        .status-btn.rejected { background-color: #dc3545; }
+        .approve-btn:disabled, .reject-btn:disabled, .status-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #fff; padding: 20px; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000; }
+        .popup-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 999; }
+        .popup label { display: block; margin-bottom: 10px; font-weight: bold; }
+        .popup input { width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .popup button { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; }
+        .popup .submit-btn { background-color: #28a745; color: white; }
+        .popup .submit-btn:hover { background-color: #218838; }
+        .popup .cancel-btn { background-color: #dc3545; color: white; margin-left: 10px; }
+        .popup .cancel-btn:hover { background-color: #c82333; }
+        .credit-tag {
+                    display: inline-block;
+                    font-size: 12px;
+                    color: #DAA520; /* GoldenRod */
+                    background-color: #fff8dc;
+                    padding: 2px 6px;
+                    margin-left: 6px;
+                    border-radius: 4px;
+                    border: 1px solid #f0c36d;
+                  }
+
+        .blinking-star {
+        animation: blink 1s infinite;
+        }
+        th.credits-header {
+         text-align: center;
+        }
+
+        @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.2; }
+        }
+
+    </style>
+</head>
+<body>
+<div class="header-container" style="display: flex; justify-content: space-between; align-items: flex-end;">
+  <div style="display: flex; align-items: flex-end; gap: 8px;">
+    <h2 style="margin: 0;">Welcome, {{ username }}</h2>
+    {% if earned_credits > 0 %}
+      <span style="font-size: 14px; vertical-align: sub; background-color: #fff8dc; border: 1px solid #f0c36d; border-radius: 4px; padding: 2px 6px;">
+        <span class="blinking-star">⭐</span> {{ earned_credits }} credits
+      </span>
+    {% endif %}
+  </div>
+        <div class="tab-buttons">
+            <button onclick="showTab('all')">All Questions</button>
+            <button onclick="showTab('mine')">My Questions</button>
+            <button onclick="window.location.href='{{ url_for('add_question') }}'" class="raise-query-button">Add Question</button>
+            {% if session.get('is_manager') %}
+                <button onclick="showTab('actions')">Actions Pending</button>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+</div>
+
+
+
+
+  
+
+      
+    <div id="all" class="tab-content">
+        <h3>All Questions</h3>
+        <label for="tagFilter">Filter by tag:</label>
+        <input type="text" id="tagFilter" placeholder="e.g. sql" style="margin-bottom: 10px;">
+        
+
+        {% with questions=all_questions, show_status=False, show_credits=True, is_pending_tab=False,Next_Step=False %}
+             {% include 'question_table_debug.html' %}
+
+        {% endwith %}
+    </div>
+
+    <div id="mine" class="tab-content">
+        <h3>My Questions</h3>
+        
+            {% with questions=my_questions, show_status=True, show_credits=True, is_pending_tab=False,Next_Step=True %}
+                {% include 'question_table_debug.html' %}
+            {% endwith %}
+        
+      </div>
+      
+
+    {% if session.get('is_manager') %}
+    <div id="actions" class="tab-content">
+        <h3>Actions Pending</h3>
+        {% with questions=pending_questions, show_status=True, show_credits=False, is_pending_tab=True,Next_Step=False %}
+            {% include 'question_table_debug.html' %}
+
+        {% endwith %}
+    </div>
+    {% endif %}
+
+    <div class="popup-overlay" id="credits-popup-overlay"></div>
+    <div class="popup" id="credits-popup">
+        <label for="credits-input">Assign Credits:</label>
+        <input type="number" id="credits-input" min="0" placeholder="Enter credits" required aria-label="Assign credits to question">
+        <button class="submit-btn" onclick="submitCredits()">Submit</button>
+        <button class="cancel-btn" onclick="closeCreditsPopup()">Cancel</button>
+    </div>
+
+    <script>
+        let currentQuestionId = null;
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+        }
+
+        function toggleComments(id) {
+    const section = document.getElementById(`comments-${id}`);
+    if (!section) {
+        console.warn(`No comment section found for ID: comments-${id}`);
+        return;
+    }
+
+    const isHidden = section.style.display === 'none' || section.style.display === '';
+    section.style.display = isHidden ? 'table-row' : 'none';
+}
+
+function refreshCommentCredits() {
+  fetch('/get_user_credits_map')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const creditsMap = data.credits;
+        document.querySelectorAll('.comment-item').forEach(item => {
+          const userSpan = item.querySelector('strong');
+          if (userSpan) {
+            const username = userSpan.textContent.replace(':', '').trim();
+            if (creditsMap.hasOwnProperty(username)) {
+              const creditTag = item.querySelector('.credit-tag');
+              if (creditTag) {
+                creditTag.textContent = `${creditsMap[username]} credits`;
+              }
+            }
+          }
+        });
+      }
+    });
+}
+
+
+function handleAccept(questionId, commentId) {
+            fetch(`/accept_answer/${questionId}/${commentId}`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Disable all accept buttons for this question
+                    document.querySelectorAll(`.accept-btn[data-question="${questionId}"]`).forEach(btn => {
+                        btn.innerText = "Accept as Answer";
+                        btn.disabled = true;  // Disable all buttons
+                        if (!btn.classList.contains('accepted')) {
+                            btn.classList.add('unaccepted');
+                        }
+                    });
+
+                    updateMyQuestionsTable();
+                    refreshCredits();
+                    //updateAllQuestionsTable();
+                    
+
+                    // Update the accepted comment's button
+                    const acceptedBtn = document.getElementById(`accept-btn-${questionId}-${commentId}`);
+                    if (acceptedBtn) {
+                        acceptedBtn.innerText = "Answer Accepted";
+                        acceptedBtn.disabled = true;
+                        acceptedBtn.classList.remove('unaccepted');
+                        acceptedBtn.classList.add('accepted');
+                    }
+
+                    // Disable comment input fields
+                    //document.getElementById(`name-${questionId}`).disabled = true;
+                    document.getElementById(`comment-${questionId}`).disabled = true;
+                    document.getElementById(`submit-${questionId}`).disabled = true;
+                    refreshCommentCredits();
+                }
+                else {
+                    alert('Error: ' + error.message);
+                }
+            });
+            
+        }
+
+function enforceButtonStates() {
+            fetch('/get_all_questions')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        data.questions.forEach(q => {
+                            const hasAccepted = q.comments.some(c => c.accepted === true);
+                            if (hasAccepted) {
+                                document.querySelectorAll(`.accept-btn[data-question="${q.id}"]`).forEach(btn => {
+                                    btn.disabled = true;
+                                    const commentId = btn.id.split('-')[3];
+                                    const isAccepted = q.comments.find(c => c.id == commentId)?.accepted === true;
+                                    if (!isAccepted) {
+                                        btn.classList.add('unaccepted');
+                                    } else {
+                                        btn.classList.add('accepted');
+                                    }
+                                });
+                                // Disable comment form
+                                //document.getElementById(`name-${q.id}`).disabled = true;
+                                //document.getElementById(`comment-${q.id}`).disabled = true;
+                                //document.getElementById(`submit-${q.id}`).disabled = true;
+                                //const nameInput = document.getElementById(`name-${q.id}`);
+                                const commentInput = document.getElementById(`comment-${q.id}`);
+                                const submitBtn = document.getElementById(`submit-${q.id}`);
+
+                                //if (nameInput) nameInput.disabled = true;
+                                if (commentInput) commentInput.disabled = true;
+                                if (submitBtn) submitBtn.disabled = true;
+
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error enforcing button states:', error));
+        }
+
+function handleApprove(questionId) {
+            currentQuestionId = questionId;
+            document.getElementById('credits-popup').style.display = 'block';
+            document.getElementById('credits-popup-overlay').style.display = 'block';
+            document.getElementById('credits-input').value = '';
+            document.getElementById('credits-input').focus();
+        }
+
+function closeCreditsPopup() {
+            document.getElementById('credits-popup').style.display = 'none';
+            document.getElementById('credits-popup-overlay').style.display = 'none';
+            currentQuestionId = null;
+        }
+function handleCommentApprove(questionId) {
+  fetch(`/approve_comment/${questionId}`, {
+    method: 'POST'
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Ready to start work.');
+
+      // ✅ Add a short delay to allow backend to finish writing
+      setTimeout(() => {
+        updatePendingQuestionsTable();
+        updateAllQuestionsTable();
+        updateMyQuestionsTable();
+        enforceButtonStates();
+        //showTab('actions');
+      }, 300); // 300ms delay
+    } else {
+      alert('Error: ' + data.error);
+    }
+  })
+  .catch(error => {
+    console.error('Error approving comment:', error);
+    alert('Unexpected error occurred.');
+  });
+}
+
+
+function handleCommentReject(questionId) {
+  fetch(`/reject_comment/${questionId}`, {
+    method: 'POST'
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+        alert('Rejected.');
+      updatePendingQuestionsTable();
+      updateAllQuestionsTable();
+      showTab('actions');
+      //updatePendingQuestionsTable();
+      //showTab('actions');
+    } else {
+      alert('Error: ' + data.error);
+    }
+  });
+}
+
+
+function updateAllQuestionsTable() {
+  fetch('/get_all_questions')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const tableBody = document.querySelector('#all table tbody');
+        tableBody.innerHTML = '';
+        data.questions.forEach(q => {
+          const row = document.createElement('tr');
+          row.setAttribute('data-question-id', q.id);
+          row.innerHTML = `
+            <td>${q.id}</td>
+            <td>${q.title}</td>
+            <td class="description-cell">${q.description.length > 15 ? q.description.substring(0, 15) + '...' : q.description}</td>
+            <td>${q.asked_by}</td>
+            <td>${q.accepted_comment_user ?? '-'}</td>
+            <td>${q.duedate}</td>
+            <td>${q.team}</td>
+            <td><span class="toggle-btn" onclick="toggleComments(${q.id})">View Comments</span></td>
+            <td>${q.date_posted}</td>
+            <td>${q.expired}</td>
+            <td class="credits-cell">${q.Credits ?? 0}</td>
+          `;
+          tableBody.appendChild(row);
+
+          const commentRow = document.createElement('tr');
+          commentRow.id = `comments-${q.id}`;
+          commentRow.className = 'comment-section';
+          commentRow.style.display = 'none';
+
+          const hasAccepted = q.comments.some(c => c.accepted === true);
+          commentRow.innerHTML = `
+            <td colspan="11">
+              <div class="full-description">
+                <strong>Full Description:</strong> ${q.description}
+              </div>
+              <div class="comments-list">
+                ${q.comments.map(c => `
+                  <div class="comment-item">
+                    <span><strong>${c.user}:</strong> ${c.text}</span>
+                    ${q.asked_by === '{{ username }}' ? `
+                      <button id="accept-btn-${q.id}-${c.id}"
+                              class="accept-btn ${c.accepted ? 'accepted' : hasAccepted ? 'unaccepted' : ''}"
+                              data-question="${q.id}"
+                              onclick="handleAccept(${q.id}, ${c.id})"
+                              ${hasAccepted ? 'disabled' : ''}>
+                        ${c.accepted ? 'Answer Accepted' : 'Accept as Answer'}
+                      </button>` : ''
+                    }
+                  </div>
+                `).join('')}
+              </div>
+              ${q.mngr_approval_received === 'yes' ? `
+                <form class="comment-form" action="/add_comment/${q.id}" method="POST">
+                  <input type="text" id="comment-${q.id}" name="comment" placeholder="Your comment" required ${hasAccepted ? 'disabled' : ''}>
+                  <button id="submit-${q.id}" type="submit" ${hasAccepted ? 'disabled' : ''}>Submit Comment</button>
+                </form>` : ''
+              }
+            </td>
+          `;
+          tableBody.appendChild(commentRow);
+        });
+      }
+    })
+    .catch(error => alert('Error refreshing All Questions: ' + error.message));
+}
+
+function updatePendingQuestionsTable() {
+  fetch('/get_pending_questions')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const tableBody = document.querySelector('#actions table tbody');
+        tableBody.innerHTML = '';
+
+        data.questions.forEach(q => {
+          const row = document.createElement('tr');
+          row.setAttribute('data-question-id', q.id);
+
+          // Build the main row
+          row.innerHTML = `
+            <td>${q.id}</td>
+            <td>${q.title}</td>
+            <td class="description-cell">${q.description.length > 15 ? q.description.substring(0, 15) + '...' : q.description}</td>
+            <td>${q.asked_by}</td>
+            <td>${q.accepted_comment_user ?? '-'}</td>
+            <td>${q.duedate}</td>
+            <td>${q.team}</td>
+            <td>
+              ${(() => {
+                const status = q.status.toLowerCase().trim();
+                if (status === 'waiting for manager approval') {
+                  return `
+                    <div class="action-buttons">
+                      <button class="approve-btn" onclick="handleApprove(${q.id})">Approve</button>
+                      <button class="reject-btn" onclick="handleReject(${q.id})">Reject</button>
+                    </div>`;
+                } else if (status === 'awaiting manager approval to start') {
+                  return `
+                    <div class="action-buttons">
+                      <button class="approve-btn" onclick="handleCommentApprove(${q.id})">Approve</button>
+                      <button class="reject-btn" onclick="handleCommentReject(${q.id})">Reject</button>
+                    </div>`;
+                } else if (status === 'posted to dashboard' || status === 'ready to start work' || status === 'credits released') {
+                  return `<button class="status-btn approved" disabled>Approved</button>`;
+                } else if (status === 'manager rejected' || status === 'rejected permission to take this work') {
+                  return `<button class="status-btn rejected" disabled>Rejected</button>`;
+                } else {
+                  return `<span>-</span>`;
+                }
+              })()}
+            </td>
+            <td>${q.date_posted}</td>
+            <td>${q.expired}</td>
+            <td class="status-cell">${q.status}</td>
+          `;
+
+          tableBody.appendChild(row);
+
+          // Build the comment row
+          const commentRow = document.createElement('tr');
+          commentRow.id = `comments-${q.id}`;
+          commentRow.className = 'comment-section';
+          commentRow.style.display = 'none';
+
+          const hasAccepted = q.comments.some(c => c.accepted === true);
+          commentRow.innerHTML = `
+            <td colspan="13">
+              <div class="full-description"><strong>Full Description:</strong> ${q.description}</div>
+              <div class="comments-list">
+                ${q.comments.map(c => `
+                  <div class="comment-item">
+                    <span><strong>${c.user}:</strong> ${c.text}</span>
+                    ${q.asked_by === "{{ username }}" ? `
+                      <button id="accept-btn-${q.id}-${c.id}"
+                        class="accept-btn ${c.accepted ? 'accepted' : hasAccepted ? 'unaccepted' : ''}"
+                        data-question="${q.id}"
+                        onclick="handleAccept(${q.id}, ${c.id})"
+                        ${hasAccepted ? 'disabled' : ''}>
+                        ${c.accepted ? 'Answer Accepted' : 'Accept as Answer'}
+                      </button>` : ''
+                    }
+                  </div>
+                `).join('')}
+              </div>
+              ${q.mngr_approval_received === 'yes' ? `
+                <form class="comment-form" action="/add_comment/${q.id}" method="POST">
+                  <input type="text" id="comment-${q.id}" name="comment" placeholder="Your comment" required ${hasAccepted ? 'disabled' : ''}>
+                  <button id="submit-${q.id}" type="submit" ${hasAccepted ? 'disabled' : ''}>Submit Comment</button>
+                </form>` : ''
+              }
+            </td>
+          `;
+
+          tableBody.appendChild(commentRow);
+        });
+      }
+    })
+    .catch(error => alert('Error refreshing Actions Pending: ' + error.message));
+}
+
+function updateMyQuestionsTable() {
+  fetch('/get_all_questions')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const username = "{{ username }}";
+        const tableBody = document.querySelector('#mine table tbody');
+        tableBody.innerHTML = '';
+
+        data.questions.forEach(q => {
+          if (q.asked_by === username || q.accepted_comment_user === username) {
+            const row = document.createElement('tr');
+            row.setAttribute('data-question-id', q.id);
+
+            // Build the main row
+            row.innerHTML = `
+              <td>${q.id}</td>
+              <td>${q.title}</td>
+              <td class="description-cell">${q.description.length > 15 ? q.description.substring(0, 15) + '...' : q.description}</td>
+              <td>${q.asked_by}</td>
+              <td>${q.accepted_comment_user ?? '-'}</td>
+              <td>${q.duedate}</td>
+              <td>${q.team}</td>
+              <td><span class="toggle-btn" onclick="toggleComments(${q.id})">View Comments</span></td>
+              <td>${q.date_posted}</td>
+              <td>${q.expired}</td>
+              <td class="status-cell">${q.status}</td>
+              <td class="credits-cell">${q.Credits ?? 0}</td>
+            `;
+
+            // Add the Next Step column
+            const normalizedStatus = q.status.toLowerCase().trim();
+            if (normalizedStatus === 'ready to start work' && q.accepted_comment_user === username) {
+              row.innerHTML += `<td><button class="approve-btn" onclick="startWork(${q.id})">Start !</button></td>`;
+            } else if (normalizedStatus === 'work in progress' && q.accepted_comment_user === username) {
+              row.innerHTML += `<td><button class="approve-btn" onclick="markCompletion(${q.id})">Finish</button></td>`;
+            } else if (normalizedStatus === 'work completed. sent for review' && q.asked_by === username) {
+              row.innerHTML += `<td><button class="approve-btn" onclick="acceptWork(${q.id})">Accept</button></td>`;
+            } else if (normalizedStatus === 'credits released') {
+              row.innerHTML += `<td><span>Done</span></td>`;
+            } else {
+              row.innerHTML += `<td><span>-</span></td>`;
+            }
+
+            tableBody.appendChild(row);
+
+            // Build the comment row
+            const commentRow = document.createElement('tr');
+            commentRow.id = `comments-${q.id}`;
+            commentRow.className = 'comment-section';
+            commentRow.style.display = 'none';
+
+            const hasAccepted = q.comments.some(c => c.accepted === true);
+            commentRow.innerHTML = `
+              <td colspan="13">
+                <div class="full-description"><strong>Full Description:</strong> ${q.description}</div>
+                <div class="comments-list">
+                  ${q.comments.map(c => `
+                    <div class="comment-item">
+                      <span><strong>${c.user}:</strong> ${c.text}</span>
+                      ${q.asked_by === username ? `
+                        <button id="accept-btn-${q.id}-${c.id}"
+                          class="accept-btn ${c.accepted ? 'accepted' : hasAccepted ? 'unaccepted' : ''}"
+                          data-question="${q.id}"
+                          onclick="handleAccept(${q.id}, ${c.id})"
+                          ${hasAccepted ? 'disabled' : ''}>
+                          ${c.accepted ? 'Answer Accepted' : 'Accept as Answer'}
+                        </button>` : ''
+                      }
+                    </div>
+                  `).join('')}
+                </div>
+                ${q.mngr_approval_received === 'yes' ? `
+                  <form class="comment-form" action="/add_comment/${q.id}" method="POST">
+                    <input type="text" id="comment-${q.id}" name="comment" placeholder="Your comment" required ${hasAccepted ? 'disabled' : ''}>
+                    <button id="submit-${q.id}" type="submit" ${hasAccepted ? 'disabled' : ''}>Submit Comment</button>
+                  </form>` : ''
+                }
+              </td>
+            `;
+
+            tableBody.appendChild(commentRow);
+          }
+        });
+      }
+    })
+    .catch(error => console.error('Error updating My Questions:', error));
+}
+
+function refreshCredits() {
+  fetch('/get_credits')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const creditSpan = document.querySelector('.blinking-star').parentElement;
+        creditSpan.innerHTML = `<span class="blinking-star">⭐</span> ${data.credits} credits`;
+      }
+    });
+}
+
+
+function submitCredits() {
+            const credits = document.getElementById('credits-input').value;
+            if (!credits || credits < 0) {
+                alert('Please enter a valid credits value (0 or positive number).');
+                return;
+            }
+            fetch(`/approve_question/${currentQuestionId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ credits: parseInt(credits) })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(`HTTP ${response.status}: ${text}`); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Question approved successfully with ' + credits + ' credits!');
+                    closeCreditsPopup();
+                    updatePendingQuestionsTable();
+                    updateAllQuestionsTable();
+                    showTab('actions');
+                } else {
+                    alert('Error approving question: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                alert('Error approving question: ' + error.message);
+            });
+        }
+
+function handleReject(questionId) {
+            if (!confirm('Are you sure you want to reject this question?')) {
+                return;
+            }
+            fetch(`/reject_question/${questionId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(`HTTP ${response.status}: ${text}`); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Question rejected!');
+                    const row = document.querySelector(`tr[data-question-id="${questionId}"]`);
+                    if (row) {
+                        row.cells[6].innerHTML = `<button class="status-btn rejected" disabled>Rejected</button>`;
+                    }
+                    updatePendingQuestionsTable();
+                    updateMyQuestionsTable()
+                    showTab('actions');
+                } else {
+                    alert('Error rejecting question: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                alert('Error rejecting question: ' + error.message);
+            });
+        }
+function startWork(questionId) {
+  fetch(`/start_work/${questionId}`, {
+    method: 'POST'
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Work started!');
+      updateMyQuestionsTable();
+      updateAllQuestionsTable
+      showTab('mine'); // Stay on My Questions tab
+    } else {
+      alert('Error: ' + data.error);
+    }
+  })
+  .catch(error => {
+    alert('Error starting work: ' + error.message);
+  });
+}
+function markCompletion(questionId) {
+  fetch(`/mark_completion/${questionId}`, {
+    method: 'POST'
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Work marked as completed!');
+      updateMyQuestionsTable();
+      showTab('mine');
+    } else {
+      alert('Error: ' + data.error);
+    }
+  })
+  .catch(error => {
+    alert('Error marking completion: ' + error.message);
+  });
+}
+function acceptWork(questionId) {
+  fetch(`/accept_work/${questionId}`, {
+    method: 'POST'
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Work accepted and credits released!');
+      updateMyQuestionsTable();
+      showTab('mine');
+    } else {
+      alert('Error: ' + data.error);
+    }
+  })
+  .catch(error => {
+    alert('Error accepting work: ' + error.message);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.comment-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+
+
+
+            enforceButtonStates();
+            //showTab('mine');
+            //updateMyQuestionsTable();
+            {% if session.get('is_manager') %}
+                showTab('actions');
+            {% else %}
+                showTab('all');
+            {% endif %}
+        });
+        
+        
+    document.getElementById('tagFilter').addEventListener('input', function () {
+    const filter = this.value.trim().toLowerCase();
+    const rows = document.querySelectorAll('.question-row'); // add this class in your loop
+
+    rows.forEach(row => {
+        const tags = row.dataset.tags;
+        row.style.display = tags.includes(filter) ? '' : 'none';
+    });
+}); 
+
+
+    </script>
+</body>
+</html>

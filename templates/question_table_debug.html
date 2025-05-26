@@ -1,0 +1,193 @@
+<!--<p style="color:red;">THIS IS THE DEBUG VERSION</p>-->
+
+<table>
+  <thead>
+    {% set is_pending_tab = is_pending_tab | default(False) %}
+      <tr>
+          <th>Id</th>
+          <th>Title</th>
+          <th>Description</th>
+        
+          <th>Asked By</th>
+              
+          <th>Accepted By</th>
+             
+
+          <th>Due Date</th>
+          <th>Team</th>
+          <th>
+            {% if is_pending_tab and session.get('is_manager') %}
+              Actions
+            {% else %}
+              Comments
+            {% endif %}
+          </th>
+          <th>Date Posted</th>
+          <th>Expired</th>
+          {% if show_status %}
+              <th>Status</th>
+          {% endif %}
+          {% if show_credits %}
+              <th class="credits-header">Credits</th>
+          {% endif %}
+
+{% if Next_Step %}
+  <th>Next Step</th>
+{% endif %}
+
+
+
+
+      </tr>
+  </thead>
+  <tbody>
+      {% for question in questions %}
+      <tr class="question-row" data-question-id="{{ question.id }}" data-tags="{{ question.tags | join(' ') }}">
+
+          <td>{{ question.id }}</td>
+          <td>{{ question.title }}</td>
+          <td class="description-cell">
+            {% if question.description|length > 15 %}
+                {{ question.description[:15] }}...
+            {% else %}
+                {{ question.description }}
+            {% endif %}
+            
+            
+          </td>
+        
+         
+         <td>{{ question.asked_by }}</td>
+        
+          <td>{{ question.accepted_comment_user or '-' }}</td>
+           
+
+          <td>{{ question.duedate }}</td>
+          <td>{{ question.team }}</td>
+          <td>
+            {% set normalized_status = question.status | lower | trim %}
+            {% if is_pending_tab and session.get('is_manager') %}
+          
+
+              {% if normalized_status == 'waiting for manager approval' %}
+                <div class="action-buttons">
+                  <button class="approve-btn" onclick="handleApprove({{ question.id }})">Approve</button>
+                  <button class="reject-btn" onclick="handleReject({{ question.id }})">Reject</button>
+                
+                </div>
+              {% elif normalized_status == 'awaiting manager approval to start' %}
+                <div class="action-buttons">
+                  <button class="approve-btn" onclick="handleCommentApprove({{ question.id }})">Approve</button>
+                  <button class="reject-btn" onclick="handleCommentReject({{ question.id }})">Reject</button>
+                 
+                </div>
+              {% elif normalized_status == 'posted to dashboard' %}
+                <button class="status-btn approved" disabled>Approved</button>
+              {% elif normalized_status == 'manager rejected' %}
+                <button class="status-btn rejected" disabled>Rejected</button>
+                {% elif normalized_status == 'ready to start work' %}
+                <button class="status-btn approved" disabled>Approved</button>
+                {% elif normalized_status == 'credits released' %}
+                <button class="status-btn approved" disabled>Approved</button>
+              {% elif normalized_status == 'rejected permission to take this work' %}
+                <button class="status-btn rejected" disabled>Rejected</button>
+
+              {% endif %}
+
+            {% else %}
+            <span class="toggle-btn"  onclick="toggleComments({{ question.id }})">View Comments</span>
+            {% endif %}
+
+              
+          </td>
+          
+          <td>{{ question.date_posted }}</td>
+          <td>{{ question.expired }}</td>
+          {% if show_status %}
+              <td class="status-cell">{{ question.status }}</td>
+          {% endif %}
+          {% if show_credits %}
+              <td class="credits-cell">{{ question.Credits|default(0) }}</td>
+          {% endif %}
+          
+{% if Next_Step %}
+  <td>
+    {% set normalized_status = question.status.lower().strip() %}
+    {% set current_user = session.get('username') %}
+    {% if normalized_status == 'ready to start work' and current_user == question.accepted_comment_user %}
+      <button class="approve-btn" onclick="startWork({{ question.id }})">Start !</button>
+    {% elif normalized_status == 'work in progress' %}
+      {% if current_user == question.accepted_comment_user %}
+        <button class="approve-btn" onclick="markCompletion({{ question.id }})">Finish</button>
+      {% elif current_user == question.asked_by %}
+        <button class="approve-btn" disabled>Accept</button>
+      {% else %}
+        <span>-</span>
+      {% endif %}
+    {% elif normalized_status == 'work completed. sent for review' %}
+      {% if current_user == question.asked_by %}
+        <button class="approve-btn" onclick="acceptWork({{ question.id }})">Accept</button>
+      {% else %}
+        <span>Wait for acceptance</span>
+      {% endif %}
+    {% elif normalized_status == 'credits released' %}
+      <span>Done</span>
+    {% else %}
+      <span>-</span>
+    {% endif %}
+  </td>
+{% endif %}
+
+
+
+
+
+      </tr>
+      <tr id="comments-{{ question.id }}" class="comment-section">
+          <td colspan="{% if show_status and show_credits %}11{% elif show_status or show_credits %}11{% else %}9{% endif %}">
+              <div class="full-description">
+                  <strong>Full Description:</strong> {{ question.description }}
+              </div>
+              <div class="comments-list">
+                  {% for comment in question.comments %}
+                  <div class="comment-item">
+                     <div>
+                        <strong>{{ comment.user }}</strong>
+                        <div class="credit-tag">{{ comment.user_credits }} credits</div><span> </span>
+                        {{ comment.text }}
+                    </div>
+
+
+{% if question.accepted_comment_user %}
+      <!-- Show disabled buttons for all comments if one is accepted -->
+      <button id="accept-btn-{{ question.id }}-{{ comment.id }}"
+              class="accept-btn {{ 'accepted' if comment.accepted else 'unaccepted' }}"
+              data-question="{{ question.id }}"
+              disabled>
+        {{ 'Answer Accepted' if comment.accepted else 'Accept as Answer' }}
+      </button>
+    {% elif question.asked_by == session.get('username') %}
+      <!-- Show active buttons only for the asker if no answer is accepted yet -->
+      <button id="accept-btn-{{ question.id }}-{{ comment.id }}"
+              class="accept-btn"
+              data-question="{{ question.id }}"
+              onclick="handleAccept({{ question.id }}, {{ comment.id }})">
+        Accept as Answer
+      </button>
+    {% endif %}
+  </div>
+{% endfor %}
+
+              </div>
+              {% if question.mngr_approval_received == 'yes' or question.mngr_approval_required == 'no' %}
+              <form class="comment-form" action="{{ url_for('add_comment', question_id=question.id) }}" method="POST">
+                  
+                  <input type="text" id="comment-{{ question.id }}" name="comment" placeholder="Your comment" required>
+                  <button id="submit-{{ question.id }}" type="submit">Submit Comment</button>
+              </form>
+              {% endif %}
+          </td>
+      </tr>
+      {% endfor %}
+  </tbody>
+</table>

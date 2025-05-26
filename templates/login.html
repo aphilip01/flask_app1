@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5; /* Matches task_details.html */
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slightly stronger shadow for depth */
+            width: 320px;
+            text-align: center;
+        }
+
+        .form-container h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .form-container input[type="text"],
+        .form-container input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px; /* Matches button border-radius */
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .form-container input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin: 20px 0 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff; /* Matches tab buttons in task_details.html */
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-container input[type="submit"]:hover {
+            background-color: #0056b3; /* Matches tab button hover */
+        }
+
+        .error {
+            color: #dc3545; /* Matches logout button color for consistency */
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 400px) {
+            .form-container {
+                width: 90%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="form-container">
+            <h2>UnBlocknSolve</h2>
+            <form method="POST">
+                <input type="text" name="username" placeholder="Username" required aria-label="Username">
+                <input type="password" name="password" placeholder="Password" required aria-label="Password">
+                <input type="submit" value="Login">
+            </form>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="error">{{ messages[0] }}</div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+</body>
+</html>

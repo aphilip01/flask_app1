@@ -1,0 +1,56 @@
+[
+    {
+        "id": 1,
+        "title": "Test case execution support",
+        "description": "Test case execution support",
+        "asked_by": "Avarachan",
+        "duedate": "2025-05-27",
+        "team": "Marshals",
+        "comments": [
+            {
+                "id": 1,
+                "user": "Ajo",
+                "text": "Sure, I am taking this up",
+                "accepted": true
+            }
+        ],
+        "date_posted": "2025-05-26 12:54:55",
+        "mngr_approval_required": "yes",
+        "mngr_approval_received": "yes",
+        "status": "Credits released",
+        "Credits": 5,
+        "accepted_comment_user": "Ajo",
+        "comment_mngr_approval_received": "yes",
+        "tags": [
+            "testing"
+        ],
+        "expired": "No"
+    },
+    {
+        "id": 2,
+        "title": "Code review request",
+        "description": "Code review request",
+        "asked_by": "Ajo",
+        "duedate": "2025-05-27",
+        "team": "Marshals",
+        "comments": [
+            {
+                "id": 1,
+                "user": "Avarachan",
+                "text": "Sure, I am taking this up",
+                "accepted": true
+            }
+        ],
+        "date_posted": "2025-05-26 12:56:40",
+        "mngr_approval_required": "no",
+        "mngr_approval_received": "no",
+        "status": "Credits released",
+        "Credits": 2,
+        "accepted_comment_user": "Avarachan",
+        "comment_mngr_approval_received": "yes",
+        "tags": [
+            "dotnet"
+        ],
+        "expired": "No"
+    }
+]
