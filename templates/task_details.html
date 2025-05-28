@@ -25,14 +25,15 @@
         
 th:nth-child(1), td:nth-child(1) { width: 30px; }     /* Id */
 th:nth-child(2), td:nth-child(2) { width: 100px; }    /* Title */
-th:nth-child(3), td:nth-child(3) { width: 100px; }    /* Description */
-th:nth-child(4), td:nth-child(4) { width: 80px; }     /* Asked By */
-th:nth-child(5), td:nth-child(5) { width: 80px; }     /* Accepted By */
-th:nth-child(6), td:nth-child(6) { width: 80px; }     /* Due Date */
-th:nth-child(7), td:nth-child(7) { width: 80px; }     /* Team */
-th:nth-child(8), td:nth-child(8) { width: 120px; }    /* Actions / Comments */
-th:nth-child(9), td:nth-child(9) { width: 120px; }    /* Date Posted */
-th:nth-child(10), td:nth-child(10) { width: 60px; }   /* Expired */
+th:nth-child(3), td:nth-child(3) { width: 100px; }    /* Tags */
+th:nth-child(4), td:nth-child(4) { width: 100px; }    /* Description */
+th:nth-child(5), td:nth-child(5) { width: 80px; }     /* Asked By */
+th:nth-child(6), td:nth-child(6) { width: 80px; }     /* Accepted By */
+th:nth-child(7), td:nth-child(7) { width: 80px; }     /* Due Date */
+th:nth-child(8), td:nth-child(8) { width: 80px; }     /* Team */
+th:nth-child(9), td:nth-child(9) { width: 120px; }    /* Actions / Comments */
+th:nth-child(10), td:nth-child(10) { width: 120px; }    /* Date Posted */
+
 th:nth-child(11), td:nth-child(11) { width: 100px; }  /* Status */
 th:nth-child(12), td:nth-child(12) { width: 80px; }   /* Credits */
 th:nth-child(13), td:nth-child(13) { width: 80px; }   /* Next Step */
@@ -137,7 +138,8 @@ th:nth-child(13), td:nth-child(13) { width: 80px; }   /* Next Step */
         <input type="text" id="tagFilter" placeholder="e.g. sql" style="margin-bottom: 10px;">
         
 
-        {% with questions=all_questions, show_status=False, show_credits=True, is_pending_tab=False,Next_Step=False %}
+        {% with questions=all_questions, show_status=False, show_credits=True, is_pending_tab=False,
+is_my_questions_tab=False,Next_Step=False %}
              {% include 'question_table_debug.html' %}
 
         {% endwith %}
@@ -146,7 +148,7 @@ th:nth-child(13), td:nth-child(13) { width: 80px; }   /* Next Step */
     <div id="mine" class="tab-content">
         <h3>My Questions</h3>
         
-            {% with questions=my_questions, show_status=True, show_credits=True, is_pending_tab=False,Next_Step=True %}
+            {% with questions=my_questions, show_status=True, show_credits=True, is_pending_tab=False,is_my_questions_tab=True,Next_Step=True %}
                 {% include 'question_table_debug.html' %}
             {% endwith %}
         
@@ -156,7 +158,8 @@ th:nth-child(13), td:nth-child(13) { width: 80px; }   /* Next Step */
     {% if session.get('is_manager') %}
     <div id="actions" class="tab-content">
         <h3>Actions Pending</h3>
-        {% with questions=pending_questions, show_status=True, show_credits=False, is_pending_tab=True,Next_Step=False %}
+        {% with questions=pending_questions, show_status=True, show_credits=False, is_pending_tab=True,
+is_my_questions_tab=False,Next_Step=False %}
             {% include 'question_table_debug.html' %}
 
         {% endwith %}
@@ -365,14 +368,16 @@ function updateAllQuestionsTable() {
           row.innerHTML = `
             <td>${q.id}</td>
             <td>${q.title}</td>
-            <td class="description-cell">${q.description.length > 15 ? q.description.substring(0, 15) + '...' : q.description}</td>
+            <td>${q.tags.join(', ')}</td>
+
+            <td class="description-cell">${q.description.length > 20 ? q.description.substring(0, 20) + '...' : q.description}</td>
             <td>${q.asked_by}</td>
             <td>${q.accepted_comment_user ?? '-'}</td>
             <td>${q.duedate}</td>
             <td>${q.team}</td>
             <td><span class="toggle-btn" onclick="toggleComments(${q.id})">View Comments</span></td>
             <td>${q.date_posted}</td>
-            <td>${q.expired}</td>
+            
             <td class="credits-cell">${q.Credits ?? 0}</td>
           `;
           tableBody.appendChild(row);
@@ -384,7 +389,7 @@ function updateAllQuestionsTable() {
 
           const hasAccepted = q.comments.some(c => c.accepted === true);
           commentRow.innerHTML = `
-            <td colspan="11">
+            <td colspan="12">
               <div class="full-description">
                 <strong>Full Description:</strong> ${q.description}
               </div>
@@ -435,7 +440,9 @@ function updatePendingQuestionsTable() {
           row.innerHTML = `
             <td>${q.id}</td>
             <td>${q.title}</td>
-            <td class="description-cell">${q.description.length > 15 ? q.description.substring(0, 15) + '...' : q.description}</td>
+            <td>${q.tags.join(', ')}</td>
+
+            <td class="description-cell">${q.description.length > 20 ? q.description.substring(0, 20) + '...' : q.description}</td>
             <td>${q.asked_by}</td>
             <td>${q.accepted_comment_user ?? '-'}</td>
             <td>${q.duedate}</td>
@@ -465,7 +472,7 @@ function updatePendingQuestionsTable() {
               })()}
             </td>
             <td>${q.date_posted}</td>
-            <td>${q.expired}</td>
+            
             <td class="status-cell">${q.status}</td>
           `;
 
@@ -531,14 +538,16 @@ function updateMyQuestionsTable() {
             row.innerHTML = `
               <td>${q.id}</td>
               <td>${q.title}</td>
-              <td class="description-cell">${q.description.length > 15 ? q.description.substring(0, 15) + '...' : q.description}</td>
+              <td>${q.tags.join(', ')}</td>
+
+              <td class="description-cell">${q.description.length > 20 ? q.description.substring(0, 20) + '...' : q.description}</td>
               <td>${q.asked_by}</td>
               <td>${q.accepted_comment_user ?? '-'}</td>
               <td>${q.duedate}</td>
               <td>${q.team}</td>
-              <td><span class="toggle-btn" onclick="toggleComments(${q.id})">View Comments</span></td>
+          
               <td>${q.date_posted}</td>
-              <td>${q.expired}</td>
+           
               <td class="status-cell">${q.status}</td>
               <td class="credits-cell">${q.Credits ?? 0}</td>
             `;
@@ -744,6 +753,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
             enforceButtonStates();
+            setInterval(() => {
+                //updateAllQuestionsTable();  // Existing function to refresh All Questions
+                refreshCredits();           // Existing function to refresh credits
+            }, 10000); // 10,000 ms = 10 seconds
             //showTab('mine');
             //updateMyQuestionsTable();
             {% if session.get('is_manager') %}

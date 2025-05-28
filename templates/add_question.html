@@ -129,41 +129,28 @@
     </div>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  const checkbox = document.getElementById('mngr_approval_required');
-  const creditSection = document.getElementById('credits-section');
-  const creditInput = document.getElementById('assignCredits');
-  const creditError = document.getElementById('credit-error');
-  const form = document.querySelector('form');
-  const availableCredits = {{ earned_credits }};
+    const checkbox = document.getElementById('mngr_approval_required');
+    const creditSection = document.getElementById('credits-section');
+    const creditInput = document.getElementById('assignCredits');
+    const creditError = document.getElementById('credit-error');
+    const availableCredits = {{ earned_credits }};
 
-  function validateCredits() {
-    if (checkbox.checked) return true; // Skip validation if manager approval is required
-    const val = parseInt(creditInput.value, 10);
-    if (isNaN(val) || val < 0 || val > availableCredits) {
-      creditError.style.display = 'block';
-      return false;
-    } else {
-      creditError.style.display = 'none';
-      return true;
-    }
-  }
-
-  creditSection.style.display = checkbox.checked ? 'none' : 'block';
-
-  checkbox.addEventListener('change', () => {
     creditSection.style.display = checkbox.checked ? 'none' : 'block';
-  });
 
-  creditInput.addEventListener('blur', validateCredits);
+    checkbox.addEventListener('change', () => {
+        creditSection.style.display = checkbox.checked ? 'none' : 'block';
+    });
 
-  form.addEventListener('submit', function (e) {
-    if (!validateCredits()) {
-      e.preventDefault(); // Prevent form submission
-    }
-  });
+    creditInput.addEventListener('blur', () => {
+        const val = parseInt(creditInput.value, 10);
+        if (isNaN(val) || val < 0 || val > availableCredits) {
+            creditError.style.display = 'block';
+        } else {
+            creditError.style.display = 'none';
+        }
+    });
 });
 </script>
-
 
 </body>
 </html>

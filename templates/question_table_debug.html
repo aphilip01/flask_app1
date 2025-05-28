@@ -6,6 +6,9 @@
       <tr>
           <th>Id</th>
           <th>Title</th>
+          
+          <th>Tags</th>
+
           <th>Description</th>
         
           <th>Asked By</th>
@@ -15,6 +18,7 @@
 
           <th>Due Date</th>
           <th>Team</th>
+          {% if not is_my_questions_tab %}
           <th>
             {% if is_pending_tab and session.get('is_manager') %}
               Actions
@@ -22,8 +26,10 @@
               Comments
             {% endif %}
           </th>
+          {% endif %}
+
           <th>Date Posted</th>
-          <th>Expired</th>
+        
           {% if show_status %}
               <th>Status</th>
           {% endif %}
@@ -46,9 +52,11 @@
 
           <td>{{ question.id }}</td>
           <td>{{ question.title }}</td>
+          <td>{{ question.tags | join(', ') }}</td>
+
           <td class="description-cell">
-            {% if question.description|length > 15 %}
-                {{ question.description[:15] }}...
+            {% if question.description|length > 20 %}
+                {{ question.description[:20] }}...
             {% else %}
                 {{ question.description }}
             {% endif %}
@@ -64,6 +72,9 @@
 
           <td>{{ question.duedate }}</td>
           <td>{{ question.team }}</td>
+          
+          {% if not is_my_questions_tab %}
+
           <td>
             {% set normalized_status = question.status | lower | trim %}
             {% if is_pending_tab and session.get('is_manager') %}
@@ -100,9 +111,9 @@
 
               
           </td>
-          
+          {% endif %}
           <td>{{ question.date_posted }}</td>
-          <td>{{ question.expired }}</td>
+
           {% if show_status %}
               <td class="status-cell">{{ question.status }}</td>
           {% endif %}
@@ -144,7 +155,9 @@
 
       </tr>
       <tr id="comments-{{ question.id }}" class="comment-section">
-          <td colspan="{% if show_status and show_credits %}11{% elif show_status or show_credits %}11{% else %}9{% endif %}">
+          <td colspan="{% if is_my_questions_tab %}11{% elif show_status and show_credits %}12{% elif show_status or show_credits %}11{% else %}10{% endif %}">
+
+
               <div class="full-description">
                   <strong>Full Description:</strong> {{ question.description }}
               </div>
