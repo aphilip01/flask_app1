@@ -23,20 +23,20 @@
         }
         th, td { border: 1px solid #ccc; padding: 10px; text-align: left; overflow: hidden; }
         
-th:nth-child(1), td:nth-child(1) { width: 30px; }     /* Id */
-th:nth-child(2), td:nth-child(2) { width: 100px; }    /* Title */
-th:nth-child(3), td:nth-child(3) { width: 100px; }    /* Tags */
-th:nth-child(4), td:nth-child(4) { width: 100px; }    /* Description */
-th:nth-child(5), td:nth-child(5) { width: 80px; }     /* Asked By */
-th:nth-child(6), td:nth-child(6) { width: 80px; }     /* Accepted By */
-th:nth-child(7), td:nth-child(7) { width: 80px; }     /* Due Date */
-th:nth-child(8), td:nth-child(8) { width: 80px; }     /* Team */
-th:nth-child(9), td:nth-child(9) { width: 120px; }    /* Actions / Comments */
-th:nth-child(10), td:nth-child(10) { width: 120px; }    /* Date Posted */
+th:nth-child(1), td:nth-child(1) { width: 2.6%; }   /* Id */
+th:nth-child(2), td:nth-child(2) { width: 8.7%; }   /* Title */
+th:nth-child(3), td:nth-child(3) { width: 8.7%; }   /* Tags */
+th:nth-child(4), td:nth-child(4) { width: 8.7%; }   /* Description */
+th:nth-child(5), td:nth-child(5) { width: 7.0%; }   /* Asked By */
+th:nth-child(6), td:nth-child(6) { width: 7.0%; }   /* Accepted By */
+th:nth-child(7), td:nth-child(7) { width: 7.0%; }   /* Due Date */
+th:nth-child(8), td:nth-child(8) { width: 7.0%; }   /* Team */
+th:nth-child(9), td:nth-child(9) { width: 10.4%; }  /* Actions / Comments */
+th:nth-child(10), td:nth-child(10) { width: 10.4%; }/* Date Posted */
+th:nth-child(11), td:nth-child(11) { width: 8.7%; } /* Status */
+th:nth-child(12), td:nth-child(12) { width: 7.0%; } /* Credits */
+th:nth-child(13), td:nth-child(13) { width: 7.0%; } /* Next Step */
 
-th:nth-child(11), td:nth-child(11) { width: 100px; }  /* Status */
-th:nth-child(12), td:nth-child(12) { width: 80px; }   /* Credits */
-th:nth-child(13), td:nth-child(13) { width: 80px; }   /* Next Step */
 
 
             
@@ -109,11 +109,12 @@ th:nth-child(13), td:nth-child(13) { width: 80px; }   /* Next Step */
 <div class="header-container" style="display: flex; justify-content: space-between; align-items: flex-end;">
   <div style="display: flex; align-items: flex-end; gap: 8px;">
     <h2 style="margin: 0;">Welcome, {{ username }}</h2>
-    {% if earned_credits > 0 %}
-      <span style="font-size: 14px; vertical-align: sub; background-color: #fff8dc; border: 1px solid #f0c36d; border-radius: 4px; padding: 2px 6px;">
-        <span class="blinking-star">⭐</span> {{ earned_credits }} credits
-      </span>
-    {% endif %}
+{% if earned_credits is not none %}
+  <span style="font-size: 14px; vertical-align: sub; background-color: #fff8dc; border: 1px solid #f0c36d; border-radius: 4px; padding: 2px 6px;">
+    <span class="blinking-star">⭐</span> {{ earned_credits }} credits
+  </span>
+{% endif %}
+
   </div>
         <div class="tab-buttons">
             <button onclick="showTab('all')">All Questions</button>
