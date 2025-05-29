@@ -46,5 +46,37 @@
         "credits_available": 0,
         "username": "Scaria",
         "is_manager": true
+    },
+    "John": {
+        "password": "123",
+        "IsManager": "no",
+        "manager": "Annie",
+        "credits_available": 0,
+        "username": "John",
+        "is_manager":false
+    },
+    "Annie": {
+        "password": "123",
+        "IsManager": "yes",
+        "manager": "abc",
+        "credits_available": 0,
+        "username": "Annie",
+        "is_manager":true
+    },
+    "Jane": {
+        "password": "123",
+        "IsManager": "no",
+        "manager": "James",
+        "credits_available": 0,
+        "username": "Jane",
+        "is_manager":no
+    },
+    "James": {
+        "password": "123",
+        "IsManager": "yes",
+        "manager": "abc",
+        "credits_available": 0,
+        "username": "James",
+        "is_manager":yes
     }
 }
