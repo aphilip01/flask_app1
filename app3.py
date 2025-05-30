@@ -330,7 +330,6 @@ def get_all_questions():
         ]]
     logger.debug(f"Fetched {len(all_questions)} all questions")
     return jsonify({"success": True, "questions": all_questions})
-
 @app.route('/add_question', methods=['GET', 'POST'])
 def add_question():
 
@@ -391,7 +390,6 @@ def add_question():
         
 
     return render_template('add_question.html',earned_credits=earned_credits)
-
 @app.route('/approve_question/<int:question_id>', methods=['POST'])
 def approve_question(question_id):
     if 'username' not in session or not session.get('is_manager'):
@@ -427,7 +425,6 @@ def approve_question(question_id):
         return jsonify({"success": False, "error": "Failed to save changes"}), 500
 
     return jsonify({"success": True, "message": "Question approved successfully"})
-
 @app.route('/reject_question/<int:question_id>', methods=['POST'])
 def reject_question(question_id):
     if 'username' not in session or not session.get('is_manager'):
@@ -455,7 +452,6 @@ def reject_question(question_id):
 
     logger.warning(f"Question {question_id} not found")
     return jsonify({"success": False, "error": "Question not found"}), 404
-
 @app.route('/get_pending_questions', methods=['GET'])
 def get_pending_questions():
     if 'username' not in session or not session.get('is_manager', False):
@@ -493,8 +489,6 @@ def get_pending_questions():
 
     logger.debug(f"Fetched {len(pending_questions)} pending+historical questions for {username}")
     return jsonify({"success": True, "questions": pending_questions})
-
-
 @app.route('/questions', methods=['GET'])
 def get_questions():
     questions = read_questions_from_file()

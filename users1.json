@@ -1,0 +1,82 @@
+{
+    "Ajo": {
+        "password": "123",
+        "IsManager": "no",
+        "manager": "Bindu",
+        "credits_available": 0,
+        "username": "Ajo",
+        "is_manager": false
+    },
+    "Avarachan": {
+        "password": "123",
+        "IsManager": "no",
+        "manager": "Gireesh",
+        "credits_available": 0,
+        "username": "Avarachan",
+        "is_manager": false
+    },
+    "Sajith": {
+        "password": "123",
+        "IsManager": "no",
+        "manager": "Scaria",
+        "credits_available": 0,
+        "username": "Sajith",
+        "is_manager": false
+    },
+    "Bindu": {
+        "password": "123",
+        "IsManager": "yes",
+        "manager": "abc",
+        "credits_available": 0,
+        "username": "Bindu",
+        "is_manager": true
+    },
+    "Gireesh": {
+        "password": "123",
+        "IsManager": "yes",
+        "manager": "abc",
+        "credits_available": 0,
+        "username": "Gireesh",
+        "is_manager": true
+    },
+    "Scaria": {
+        "password": "123",
+        "IsManager": "yes",
+        "manager": "abc",
+        "credits_available": 0,
+        "username": "Scaria",
+        "is_manager": true
+    },
+    "John": {
+        "password": "123",
+        "IsManager": "no",
+        "manager": "Annie",
+        "credits_available": 0,
+        "username": "John",
+        "is_manager":false
+    },
+    "Annie": {
+        "password": "123",
+        "IsManager": "yes",
+        "manager": "abc",
+        "credits_available": 0,
+        "username": "Annie",
+        "is_manager":true
+    },
+    "Jane": {
+        "password": "123",
+        "IsManager": "no",
+        "manager": "James",
+        "credits_available": 0,
+        "username": "Jane",
+        "is_manager":no
+    },
+    "James": {
+        "password": "123",
+        "IsManager": "yes",
+        "manager": "abc",
+        "credits_available": 0,
+        "username": "James",
+        "is_manager":yes
+    }
+}
