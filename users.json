@@ -3,7 +3,7 @@
         "password": "123",
         "IsManager": "no",
         "manager": "Bindu",
-        "credits_available": 3,
+        "credits_available": 0,
         "username": "Ajo",
         "is_manager": false
     },
@@ -11,7 +11,7 @@
         "password": "123",
         "IsManager": "no",
         "manager": "Annie",
-        "credits_available": 0,
+        "credits_available": 11,
         "username": "John",
         "is_manager": false
     },
@@ -27,7 +27,7 @@
         "password": "123",
         "IsManager": "no",
         "manager": "James",
-        "credits_available": 12,
+        "credits_available": 1,
         "username": "Jane",
         "is_manager": false
     },
@@ -43,7 +43,7 @@
         "password": "123",
         "IsManager": "no",
         "manager": "Gireesh",
-        "credits_available": 7,
+        "credits_available": 0,
         "username": "Avarachan",
         "is_manager": false
     },
@@ -51,7 +51,7 @@
         "password": "123",
         "IsManager": "no",
         "manager": "Scaria",
-        "credits_available": 8,
+        "credits_available": 0,
         "username": "Sajith",
         "is_manager": false
     },
